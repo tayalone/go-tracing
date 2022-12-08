@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "9411:9411"
+      - "16686:16686"
+      - "14268:14268"
+    networks:
+      - trancing
+  api:
+    image: cosmtrek/air
+    working_dir: /project
+    volumes:
+      - ./api:/project/
+    ports:
+      - "3001:8081"
+    environment:
+      - PORT=8081
+      - JEAGER_ENDPOINT=http://jaeger:14268/api/traces
+      - SERVICE_NAME=red
+      - ENVIROMENT=develop
+    depends_on:
+      - jaeger
+    networks:
+      - trancing
+networks:
+  trancing:
+    driver: bridge
