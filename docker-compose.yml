@@ -11,7 +11,18 @@ services:
       - "16686:16686"
       - "14268:14268"
     networks:
-      - trancing
+      - tracing
+  rdb:
+    image: postgres:14.5-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: go-tracing
+    ports:
+      - "5432:5432"
+    networks:
+      - tracing
   api:
     image: cosmtrek/air
     working_dir: /project
@@ -22,12 +33,19 @@ services:
     environment:
       - PORT=8081
       - JEAGER_ENDPOINT=http://jaeger:14268/api/traces
-      - SERVICE_NAME=red
+      - SERVICE_NAME=go-api
       - ENVIROMENT=develop
+      - RDM_HOST=rdb
+      - RDM_PORT=5432
+      - RDM_USER=postgres
+      - RDM_PASSWORD=example
+      - RDM_DB=go-tracing
+      - RDM_MIGRATION=false
+      - TIME_ZONE=Asia/Bangkok
     depends_on:
       - jaeger
     networks:
-      - trancing
+      - tracing
 networks:
-  trancing:
+  tracing:
     driver: bridge
