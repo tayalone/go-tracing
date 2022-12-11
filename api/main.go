@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tayalone/go-trancing/api/db"
 	"github.com/tayalone/go-trancing/api/trancer"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
@@ -17,9 +18,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Otel Trancer Loonking Good !!!")
+	log.Println("Otel Tracer Loonking Good !!!")
 	// / -----------------------
 
+	// // --------- db connection ---------------
+	rdb, rdbErr := db.New()
+	if rdbErr != nil {
+		log.Fatal(err)
+	}
+	// // ---------------------------------------
 	r := gin.Default()
 	r.Use(otelgin.Middleware(os.Getenv("SERVICE_NAME"))) // <- add Otel Middleware
 
@@ -49,6 +56,33 @@ func main() {
 
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "ok",
+		})
+	})
+
+	r.GET("/todo/:id", func(ctx *gin.Context) {
+		type getIDUri struct {
+			ID uint `uri:"id" binding:"required"`
+		}
+
+		var gi getIDUri
+		if err := ctx.ShouldBindUri(&gi); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+			return
+		}
+
+		var td db.Todo
+		r := rdb.First(&td, gi.ID)
+		if r.RowsAffected != 1 {
+			// return emptyBc, errors.New("Barcode Condition Not Found")
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"message": "not found todo",
+			})
+			return
+		}
+		// return bc, nil
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "ok",
+			"todo":    td,
 		})
 	})
 
