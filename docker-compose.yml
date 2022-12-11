@@ -35,9 +35,13 @@ services:
       - JEAGER_ENDPOINT=http://jaeger:14268/api/traces
       - SERVICE_NAME=go-api
       - ENVIROMENT=develop
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=example
-      - ME_CONFIG_MONGODB_URL=mongodb://root:example@mongo:27017/
+      - RDM_HOST=rdb
+      - RDM_PORT=5432
+      - RDM_USER=postgres
+      - RDM_PASSWORD=example
+      - RDM_DB=go-tracing
+      - RDM_MIGRATION=false
+      - TIME_ZONE=Asia/Bangkok
     depends_on:
       - jaeger
     networks:
