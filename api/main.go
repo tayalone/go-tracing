@@ -30,10 +30,10 @@ func main() {
 		})
 	})
 
-	r.GET("/test-trancing-1", func(ctx *gin.Context) {
+	r.GET("/test-tracing-1", func(ctx *gin.Context) {
 		time.Sleep(50 * time.Millisecond)
 
-		tr := tp.Tracer("/testxtrancing-1")
+		tr := tp.Tracer("/testxtracing-1")
 
 		// / do task no1
 		_, span1 := tr.Start(ctx.Request.Context(), "task-1")

@@ -11,12 +11,18 @@ services:
       - "16686:16686"
       - "14268:14268"
     networks:
-      - trancing
-  mongo:
-    image: mongo:latest
+      - tracing
+  rdb:
+    image: postgres:14.5-alpine
+    restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: go-tracing
+    ports:
+      - "5432:5432"
+    networks:
+      - tracing
   api:
     image: cosmtrek/air
     working_dir: /project
@@ -35,7 +41,7 @@ services:
     depends_on:
       - jaeger
     networks:
-      - trancing
+      - tracing
 networks:
-  trancing:
+  tracing:
     driver: bridge
