@@ -71,7 +71,10 @@ func main() {
 		}
 
 		var td db.Todo
-		r := rdb.First(&td, gi.ID)
+
+		// r := rdb.First(&td, gi.ID)
+
+		r := rdb.WithContext(ctx.Request.Context()).First(&td, gi.ID)
 		if r.RowsAffected != 1 {
 			// return emptyBc, errors.New("Barcode Condition Not Found")
 			ctx.JSON(http.StatusNotFound, gin.H{

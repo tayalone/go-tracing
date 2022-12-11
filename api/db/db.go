@@ -8,12 +8,13 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/plugin/opentelemetry/tracing"
 )
 
 // Todo is db schema `barcode_condition`
 type Todo struct {
 	ID        uint   `gorm:"primaryKey" json:"id"`
-	UserID    uint   `gorm:"not null;index;index:coureier_code_is_code" json:"courierCode"`
+	UserID    uint   `gorm:"not null;index;" json:"userId"`
 	Title     string `gorm:"not null;" json:"title"`
 	Completed bool   `gorm:"not null;index;" json:"completed"`
 
@@ -65,6 +66,13 @@ func New() (*gorm.DB, error) {
 
 	}
 	log.Println("Connect RDB Success!!!")
+
+	// --------- setup trancing ----------------------------
+	if err := db.Use(tracing.NewPlugin(tracing.WithoutMetrics())); err != nil {
+		panic(err)
+	}
+	// ----------------------------------------------------
+	log.Println("db is added tracing plugin!!!")
 
 	migrate(db)
 
