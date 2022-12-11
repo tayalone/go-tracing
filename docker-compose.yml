@@ -12,6 +12,11 @@ services:
       - "14268:14268"
     networks:
       - trancing
+  mongo:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
   api:
     image: cosmtrek/air
     working_dir: /project
@@ -22,8 +27,11 @@ services:
     environment:
       - PORT=8081
       - JEAGER_ENDPOINT=http://jaeger:14268/api/traces
-      - SERVICE_NAME=red
+      - SERVICE_NAME=go-api
       - ENVIROMENT=develop
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=example
+      - ME_CONFIG_MONGODB_URL=mongodb://root:example@mongo:27017/
     depends_on:
       - jaeger
     networks:
